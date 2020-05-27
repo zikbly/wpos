@@ -1,0 +1,59 @@
+1. Install Xampp version 5.6.19. Any other version of Xampp might not work.
+
+2. Uncomment mod_proxy_http & mod_proxy_wstunnel in the apache config file (C:\xampp\apache\conf\httpd.conf).
+
+3. Add the block of code below to C:\xampp\apache\conf\extra\httpd-vhosts.conf:
+
+<VirtualHost *:443>
+
+DocumentRoot /xampp/htdocs/wpos
+ServerName 127.0.0.1
+
+#ErrorLog ${APACHE_LOG_DIR}/error.log
+#CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+SSLEngine on
+SSLCipherSuite !ADH:!DSS:!RC4:HIGH:+3DES:+RC4
+SSLProtocol all -SSLv2 -SSLv3
+SSLCertificateFile /xampp/apache/conf/ssl.crt/server.crt
+SSLCertificateKeyFile /xampp/apache/conf/ssl.key/server.key
+
+<Directory /xampp/htdocs/wpos >
+    AllowOverride all
+</Directory>
+
+# WSPROXY CONF
+ProxyRequests Off
+ProxyPreserveHost On
+<Proxy *>
+    Order deny,allow
+    Allow from all
+</Proxy>
+ProxyPass /socket.io/1/websocket/ ws://localhost:8080/socket.io/1/websocket/
+ProxyPassReverse /socket.io/1/websocket/ ws://localhost:8080/socket.io/1/websocket
+ProxyPass /socket.io/ http://localhost:8080/socket.io/
+ProxyPassReverse /socket.io/ http://localhost:8080/socket.io/
+<Location /socket.io>
+    Order allow,deny
+    Allow from all
+</Location>
+
+</VirtualHost>
+
+4. Add C:\xampp to the PATH environment variable.
+
+5. Install nodejs in the C:\xampp directory.
+
+6. Run "npm install socket.io" from CMD and make sure socket.io is installed with the path C:\xampp\htdocs\wpos\api\node_modules\socket.io\. Afterward, crosscheck if node_modules\socket.io is really in the api directory, otherwise copy it there.
+
+7. Create database in phpmyadmin with name "dev" and import "install.sql" file at C:\xampp\htdocs\wpos\library\installer\schemas\
+
+8. Access localhost "https://localhost/installer". Don't forget to add "https://" otherwise it won't work.
+
+9. During the setup installation, use "dev" as Database name and "root" as Database username. Leave password field blank.
+
+10. When asked to provide a password for "admin" during the setup installation, just use "12345678"; I have no idea what that password is for.
+
+11. If you make it to the POS admin login page, use "admin" as both username and password to successfully login.
+
+NB: If you try to access the POS admin login page and it gets stuck on the "initializing page", just close the tab, re-open a new tab and try again. If that doesn't work also, close the tab,  restart apache and MySQL in Xampp, re-open a new tab, and try again.  

@@ -1,0 +1,5 @@
+.idea/
+.jshintrc
+nbproject
+library/wpos/.dbconfig.json
+docs/
